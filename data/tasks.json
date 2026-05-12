@@ -89,6 +89,7 @@
       "createdAt": "2026-05-12T00:00:00Z"
     }
   ],
+  /** Step 6: Add default priorities for new categories here */
   "categoryPriorities": {
     "FF": "high",
     "LO.com": "high",

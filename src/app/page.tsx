@@ -1,10 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from "react";
 
-type Category = 'FF' | 'LO.com' | 'Blog' | 'Pinterest' | 'n8n' | 'Insta' | 'Other';
-type Priority = 'high' | 'medium' | 'low';
-type Status = 'todo' | 'in-progress' | 'done';
+/** Step 2: Add new categories here */
+type Category =
+  | "FF"
+  | "LO.com"
+  | "Blog"
+  | "Pinterest"
+  | "n8n"
+  | "Insta"
+  | "Other";
+type Priority = "high" | "medium" | "low";
+type Status = "todo" | "in-progress" | "done";
 
 interface Task {
   id: string;
@@ -30,36 +38,38 @@ interface DumpResult {
   summary: string;
 }
 
+/** Step 3: Add a new Tailwind color for new category here */
 const CATEGORY_COLORS: Record<Category, string> = {
-  FF: 'bg-violet-500/20 text-violet-300 border-violet-500/40',
-  'LO.com': 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
-  Blog: 'bg-orange-500/20 text-orange-300 border-orange-500/40',
-  Pinterest: 'bg-pink-500/20 text-pink-300 border-pink-500/40',
-  n8n: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
-  Insta: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-  Other: 'bg-slate-500/20 text-slate-300 border-slate-500/40',
+  FF: "bg-violet-500/20 text-violet-300 border-violet-500/40",
+  "LO.com": "bg-cyan-500/20 text-cyan-300 border-cyan-500/40",
+  Blog: "bg-orange-500/20 text-orange-300 border-orange-500/40",
+  Pinterest: "bg-pink-500/20 text-pink-300 border-pink-500/40",
+  n8n: "bg-blue-500/20 text-blue-300 border-blue-500/40",
+  Insta: "bg-purple-500/20 text-purple-300 border-purple-500/40",
+  Other: "bg-slate-500/20 text-slate-300 border-slate-500/40",
 };
 
+/** Step 4: Add a new Tailwind color for new category here */
 const CATEGORY_ACTIVE: Record<Category, string> = {
-  FF: 'bg-violet-500/30 text-violet-200 border-violet-500/60',
-  'LO.com': 'bg-cyan-500/30 text-cyan-200 border-cyan-500/60',
-  Blog: 'bg-orange-500/30 text-orange-200 border-orange-500/60',
-  Pinterest: 'bg-pink-500/30 text-pink-200 border-pink-500/60',
-  n8n: 'bg-blue-500/30 text-blue-200 border-blue-500/60',
-  Insta: 'bg-purple-500/30 text-purple-200 border-purple-500/60',
-  Other: 'bg-slate-500/30 text-slate-200 border-slate-500/60',
+  FF: "bg-violet-500/30 text-violet-200 border-violet-500/60",
+  "LO.com": "bg-cyan-500/30 text-cyan-200 border-cyan-500/60",
+  Blog: "bg-orange-500/30 text-orange-200 border-orange-500/60",
+  Pinterest: "bg-pink-500/30 text-pink-200 border-pink-500/60",
+  n8n: "bg-blue-500/30 text-blue-200 border-blue-500/60",
+  Insta: "bg-purple-500/30 text-purple-200 border-purple-500/60",
+  Other: "bg-slate-500/30 text-slate-200 border-slate-500/60",
 };
 
 const PRIORITY_DOT: Record<Priority, string> = {
-  high: 'bg-red-400',
-  medium: 'bg-amber-400',
-  low: 'bg-green-400',
+  high: "bg-red-400",
+  medium: "bg-amber-400",
+  low: "bg-green-400",
 };
 
 const PRIORITY_LABEL: Record<Priority, string> = {
-  high: 'text-red-400',
-  medium: 'text-amber-400',
-  low: 'text-green-400',
+  high: "text-red-400",
+  medium: "text-amber-400",
+  low: "text-green-400",
 };
 
 const STATUS_CYCLE: Record<Status, Status> = {
@@ -68,10 +78,19 @@ const STATUS_CYCLE: Record<Status, Status> = {
   'done': 'todo',
 };
 
-const CATEGORIES: Category[] = ['FF', 'LO.com', 'Blog', 'Pinterest', 'n8n', 'Insta', 'Other'];
+/** Step 5: Add new categories here */
+const CATEGORIES: Category[] = [
+  "FF",
+  "LO.com",
+  "Blog",
+  "Pinterest",
+  "n8n",
+  "Insta",
+  "Other",
+];
 
 export default function Home() {
-  const [dumpText, setDumpText] = useState('');
+  const [dumpText, setDumpText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [dumpResult, setDumpResult] = useState<DumpResult | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -84,7 +103,7 @@ export default function Home() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const fetchTasks = useCallback(async () => {
-    const res = await fetch('/api/tasks');
+    const res = await fetch("/api/tasks");
     const data = await res.json();
     setTasks(data.tasks);
   }, []);
@@ -95,12 +114,12 @@ export default function Home() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         processDump();
       }
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   });
 
   async function processDump() {
@@ -110,28 +129,28 @@ export default function Home() {
     setAddedIndices(new Set());
     setError(null);
     try {
-      const res = await fetch('/api/process-dump', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/process-dump", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dumpText }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? 'Something went wrong');
+        setError(data.error ?? "Something went wrong");
         return;
       }
       setDumpResult(data);
     } catch {
-      setError('Failed to reach the server. Is the app running?');
+      setError("Failed to reach the server. Is the app running?");
     } finally {
       setIsProcessing(false);
     }
   }
 
   async function addTask(extracted: ExtractedTask, index: number) {
-    const res = await fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text: extracted.text,
         category: extracted.category,
@@ -161,11 +180,13 @@ export default function Home() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: task.id, status: newStatus }),
     });
-    setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)));
+    setTasks((prev) =>
+      prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)),
+    );
   }
 
   async function deleteTask(id: string) {
-    await fetch(`/api/tasks?id=${id}`, { method: 'DELETE' });
+    await fetch(`/api/tasks?id=${id}`, { method: "DELETE" });
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }
 
@@ -176,23 +197,27 @@ export default function Home() {
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    const SR =
+      (window as any).SpeechRecognition ??
+      (window as any).webkitSpeechRecognition;
     if (!SR) {
-      setError('Voice input requires Chrome or Edge.');
+      setError("Voice input requires Chrome or Edge.");
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recognition: any = new SR();
     recognition.continuous = true;
     recognition.interimResults = false;
-    recognition.lang = 'en-US';
+    recognition.lang = "en-US";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (e: any) => {
-      let transcript = '';
+      let transcript = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         transcript += e.results[i][0].transcript;
       }
-      setDumpText((prev) => prev + (prev && !prev.endsWith(' ') ? ' ' : '') + transcript);
+      setDumpText(
+        (prev) => prev + (prev && !prev.endsWith(" ") ? " " : "") + transcript,
+      );
     };
     recognition.onend = () => setIsRecording(false);
     recognition.onerror = () => setIsRecording(false);
@@ -203,7 +228,7 @@ export default function Home() {
   }
 
   function clearDump() {
-    setDumpText('');
+    setDumpText("");
     setDumpResult(null);
     setAddedIndices(new Set());
     setError(null);
@@ -232,13 +257,15 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-900 text-slate-100">
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
-
         {/* Header */}
         <div className="flex items-end justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Brain Dump</h1>
+            <h1 className="text-3xl font-bold text-white tracking-tight">
+              Brain Dump
+            </h1>
             <p className="text-slate-400 mt-1 text-sm">
-              {pendingCount} active task{pendingCount !== 1 ? 's' : ''} across {CATEGORIES.length} projects
+              {pendingCount} active task{pendingCount !== 1 ? "s" : ""} across{" "}
+              {CATEGORIES.length} projects
             </p>
           </div>
           <span className="text-slate-600 text-xs">⌘↵ to process</span>
@@ -254,22 +281,20 @@ export default function Home() {
             className="w-full h-44 bg-slate-900 rounded-xl p-4 text-slate-100 placeholder-slate-600 border border-slate-700 focus:border-violet-500 focus:outline-none resize-none text-sm leading-relaxed"
           />
 
-          {error && (
-            <p className="text-red-400 text-sm px-1">{error}</p>
-          )}
+          {error && <p className="text-red-400 text-sm px-1">{error}</p>}
 
           <div className="flex gap-2.5 items-center">
             <button
               onClick={toggleVoice}
-              title={isRecording ? 'Stop recording' : 'Voice input'}
+              title={isRecording ? "Stop recording" : "Voice input"}
               className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                 isRecording
-                  ? 'bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse'
-                  : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600'
+                  ? "bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse"
+                  : "bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600"
               }`}
             >
-              <span>{isRecording ? '⏹' : '🎤'}</span>
-              {isRecording ? 'Listening…' : 'Voice'}
+              <span>{isRecording ? "⏹" : "🎤"}</span>
+              {isRecording ? "Listening…" : "Voice"}
             </button>
 
             {(dumpText || dumpResult) && (
@@ -292,7 +317,7 @@ export default function Home() {
                   Reading your dump…
                 </>
               ) : (
-                '✨ Process Dump'
+                "✨ Process Dump"
               )}
             </button>
           </div>
@@ -304,11 +329,13 @@ export default function Home() {
             <div className="p-5 border-b border-slate-700 flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold text-violet-300">
-                  {newTaskCount} new task{newTaskCount !== 1 ? 's' : ''} found
+                  {newTaskCount} new task{newTaskCount !== 1 ? "s" : ""} found
                   {dumpResult.extracted_tasks.some((t) => t.is_duplicate) &&
                     ` · ${dumpResult.extracted_tasks.filter((t) => t.is_duplicate).length} already tracked`}
                 </p>
-                <p className="text-slate-400 text-sm mt-0.5">{dumpResult.summary}</p>
+                <p className="text-slate-400 text-sm mt-0.5">
+                  {dumpResult.summary}
+                </p>
               </div>
               {unadded > 0 && (
                 <button
@@ -327,7 +354,11 @@ export default function Home() {
                   <div
                     key={i}
                     className={`flex items-start gap-3 px-5 py-3.5 ${
-                      task.is_duplicate ? 'opacity-50' : added ? 'bg-green-500/5' : ''
+                      task.is_duplicate
+                        ? "opacity-50"
+                        : added
+                          ? "bg-green-500/5"
+                          : ""
                     }`}
                   >
                     <span
@@ -336,15 +367,23 @@ export default function Home() {
                       {task.category}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-slate-200 text-sm leading-snug">{task.text}</p>
+                      <p className="text-slate-200 text-sm leading-snug">
+                        {task.text}
+                      </p>
                       {task.notes && (
-                        <p className="text-slate-500 text-xs mt-0.5">{task.notes}</p>
+                        <p className="text-slate-500 text-xs mt-0.5">
+                          {task.notes}
+                        </p>
                       )}
                       {task.is_duplicate && (
-                        <p className="text-amber-400/70 text-xs mt-0.5">Already in your list</p>
+                        <p className="text-amber-400/70 text-xs mt-0.5">
+                          Already in your list
+                        </p>
                       )}
                     </div>
-                    <span className={`shrink-0 text-xs font-medium ${PRIORITY_LABEL[task.priority]}`}>
+                    <span
+                      className={`shrink-0 text-xs font-medium ${PRIORITY_LABEL[task.priority]}`}
+                    >
                       {task.priority}
                     </span>
                     {!task.is_duplicate && (
@@ -353,11 +392,11 @@ export default function Home() {
                         disabled={added}
                         className={`shrink-0 text-xs px-2.5 py-1 rounded-lg font-medium transition-all ${
                           added
-                            ? 'text-green-400 cursor-default'
-                            : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
+                            ? "text-green-400 cursor-default"
+                            : "bg-slate-700 hover:bg-slate-600 text-slate-300"
                         }`}
                       >
-                        {added ? '✓ Added' : '+ Add'}
+                        {added ? "✓ Added" : "+ Add"}
                       </button>
                     )}
                   </div>
@@ -384,11 +423,11 @@ export default function Home() {
           {/* Category tabs */}
           <div className="flex flex-wrap gap-1.5">
             <button
-              onClick={() => setActiveCategory('All')}
+              onClick={() => setActiveCategory("All")}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                activeCategory === 'All'
-                  ? 'bg-slate-200 text-slate-900 border-slate-200'
-                  : 'bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200'
+                activeCategory === "All"
+                  ? "bg-slate-200 text-slate-900 border-slate-200"
+                  : "bg-slate-800 text-slate-400 border-slate-700 hover:border-slate-500 hover:text-slate-200"
               }`}
             >
               All
@@ -414,7 +453,9 @@ export default function Home() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                  activeCategory === cat ? CATEGORY_ACTIVE[cat] : CATEGORY_COLORS[cat] + ' opacity-60 hover:opacity-100'
+                  activeCategory === cat
+                    ? CATEGORY_ACTIVE[cat]
+                    : CATEGORY_COLORS[cat] + " opacity-60 hover:opacity-100"
                 }`}
               >
                 {cat}
@@ -423,14 +464,18 @@ export default function Home() {
           </div>
 
           {/* Priority groups */}
-          {(['high', 'medium', 'low'] as Priority[]).map((priority) => {
+          {(["high", "medium", "low"] as Priority[]).map((priority) => {
             const group = byPriority(priority);
             if (group.length === 0) return null;
             return (
               <div key={priority} className="space-y-1.5">
                 <div className="flex items-center gap-2 pt-1">
-                  <div className={`w-2 h-2 rounded-full ${PRIORITY_DOT[priority]}`} />
-                  <span className={`text-xs font-bold uppercase tracking-widest ${PRIORITY_LABEL[priority]}`}>
+                  <div
+                    className={`w-2 h-2 rounded-full ${PRIORITY_DOT[priority]}`}
+                  />
+                  <span
+                    className={`text-xs font-bold uppercase tracking-widest ${PRIORITY_LABEL[priority]}`}
+                  >
                     {priority}
                   </span>
                 </div>
@@ -499,7 +544,9 @@ function TaskRow({
       </button>
 
       <div className="flex-1 min-w-0">
-        <p className={`text-sm leading-snug ${isDone ? 'line-through text-slate-500' : 'text-slate-200'}`}>
+        <p
+          className={`text-sm leading-snug ${isDone ? "line-through text-slate-500" : "text-slate-200"}`}
+        >
           {task.text}
         </p>
         {isInProgress && (
@@ -510,7 +557,9 @@ function TaskRow({
         )}
       </div>
 
-      <span className={`shrink-0 text-xs px-2 py-0.5 rounded-md border font-medium ${CATEGORY_COLORS[task.category]}`}>
+      <span
+        className={`shrink-0 text-xs px-2 py-0.5 rounded-md border font-medium ${CATEGORY_COLORS[task.category]}`}
+      >
         {task.category}
       </span>
 
