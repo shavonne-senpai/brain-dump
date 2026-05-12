@@ -5,8 +5,13 @@ let _client: SupabaseClient | null = null;
 export function getSupabase(): SupabaseClient {
   if (!_client) {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
+    // Support both new key name (sb_secret_...) and legacy service_role key
+    const key = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+      throw new Error(
+        'Missing Supabase env vars. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY for legacy projects).'
+      );
+    }
     _client = createClient(url, key);
   }
   return _client;
