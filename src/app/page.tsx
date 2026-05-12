@@ -62,6 +62,12 @@ const PRIORITY_LABEL: Record<Priority, string> = {
   low: 'text-green-400',
 };
 
+const STATUS_CYCLE: Record<Status, Status> = {
+  'todo': 'in-progress',
+  'in-progress': 'done',
+  'done': 'todo',
+};
+
 const CATEGORIES: Category[] = ['FF', 'LO.com', 'Blog', 'Pinterest', 'n8n', 'Insta', 'Other'];
 
 export default function Home() {
@@ -69,7 +75,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [dumpResult, setDumpResult] = useState<DumpResult | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [activeCategory, setActiveCategory] = useState<Category | 'All'>('All');
+  const [activeCategory, setActiveCategory] = useState<Category | 'All' | 'In Progress'>('All');
   const [showDone, setShowDone] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [addedIndices, setAddedIndices] = useState<Set<number>>(new Set());
@@ -148,8 +154,8 @@ export default function Home() {
     }
   }
 
-  async function toggleDone(task: Task) {
-    const newStatus: Status = task.status === 'done' ? 'todo' : 'done';
+  async function cycleStatus(task: Task) {
+    const newStatus = STATUS_CYCLE[task.status];
     await fetch('/api/tasks', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -205,8 +211,14 @@ export default function Home() {
   }
 
   const visibleTasks = tasks
-    .filter((t) => activeCategory === 'All' || t.category === activeCategory)
+    .filter((t) => {
+      if (activeCategory === 'All') return true;
+      if (activeCategory === 'In Progress') return t.status === 'in-progress';
+      return t.category === activeCategory;
+    })
     .filter((t) => showDone || t.status !== 'done');
+
+  const inProgressCount = tasks.filter((t) => t.status === 'in-progress').length;
 
   const byPriority = (p: Priority) => visibleTasks.filter((t) => t.priority === p);
   const doneCount = tasks.filter((t) => t.status === 'done').length;
@@ -381,6 +393,22 @@ export default function Home() {
             >
               All
             </button>
+            <button
+              onClick={() => setActiveCategory('In Progress')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                activeCategory === 'In Progress'
+                  ? 'bg-blue-500/30 text-blue-200 border-blue-500/60'
+                  : 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20 hover:border-blue-500/40'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block" />
+              In Progress
+              {inProgressCount > 0 && (
+                <span className="bg-blue-500/30 text-blue-300 rounded-md px-1 py-0.5 text-[10px] font-bold leading-none">
+                  {inProgressCount}
+                </span>
+              )}
+            </button>
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -410,7 +438,7 @@ export default function Home() {
                   <TaskRow
                     key={task.id}
                     task={task}
-                    onToggleDone={toggleDone}
+                    onCycleStatus={cycleStatus}
                     onDelete={deleteTask}
                   />
                 ))}
@@ -432,40 +460,49 @@ export default function Home() {
 
 function TaskRow({
   task,
-  onToggleDone,
+  onCycleStatus,
   onDelete,
 }: {
   task: Task;
-  onToggleDone: (t: Task) => void;
+  onCycleStatus: (t: Task) => void;
   onDelete: (id: string) => void;
 }) {
   const [hovering, setHovering] = useState(false);
   const isDone = task.status === 'done';
+  const isInProgress = task.status === 'in-progress';
 
   return (
     <div
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       className={`flex items-start gap-3 px-4 py-3 bg-slate-800 rounded-xl border transition-all ${
-        isDone ? 'border-slate-800 opacity-40' : 'border-slate-700 hover:border-slate-600'
+        isDone
+          ? 'border-slate-800 opacity-40'
+          : isInProgress
+          ? 'border-blue-500/30 hover:border-blue-500/50'
+          : 'border-slate-700 hover:border-slate-600'
       }`}
     >
       <button
-        onClick={() => onToggleDone(task)}
+        onClick={() => onCycleStatus(task)}
+        title={isDone ? 'Mark todo' : isInProgress ? 'Mark done' : 'Mark in progress'}
         className={`shrink-0 mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
           isDone
             ? 'bg-green-500 border-green-500 text-white'
-            : 'border-slate-600 hover:border-violet-400'
+            : isInProgress
+            ? 'bg-blue-500/20 border-blue-400 text-blue-400'
+            : 'border-slate-600 hover:border-slate-400'
         }`}
       >
         {isDone && <span className="text-[9px] leading-none font-bold">✓</span>}
+        {isInProgress && <span className="text-[9px] leading-none font-bold">▶</span>}
       </button>
 
       <div className="flex-1 min-w-0">
         <p className={`text-sm leading-snug ${isDone ? 'line-through text-slate-500' : 'text-slate-200'}`}>
           {task.text}
         </p>
-        {task.status === 'in-progress' && !isDone && (
+        {isInProgress && (
           <span className="text-xs text-blue-400 mt-0.5 block">In progress</span>
         )}
         {task.notes && !isDone && (
