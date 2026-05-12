@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { readTaskStore } from '@/lib/tasks';
+import { getSupabase } from '@/lib/supabase';
+import { mapRow } from '@/lib/tasks';
 
 const client = new Anthropic();
 
@@ -17,8 +18,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No dump text provided' }, { status: 400 });
   }
 
-  const store = readTaskStore();
-  const activeTasks = store.tasks.filter((t) => t.status !== 'done');
+  const { data: rows } = await getSupabase()
+    .from('tasks')
+    .select('*')
+    .neq('status', 'done')
+    .order('created_at', { ascending: true });
+
+  const activeTasks = (rows ?? []).map(mapRow);
   const taskSummary = activeTasks
     .map((t) => `[${t.id}] ${t.category} (${t.priority}): ${t.text}`)
     .join('\n');
@@ -87,6 +93,5 @@ Return ONLY valid JSON, no markdown fences:
     return NextResponse.json({ error: 'Could not parse Claude response as JSON' }, { status: 500 });
   }
 
-  const result = JSON.parse(jsonMatch[0]);
-  return NextResponse.json(result);
+  return NextResponse.json(JSON.parse(jsonMatch[0]));
 }
