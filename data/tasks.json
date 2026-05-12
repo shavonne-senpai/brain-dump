@@ -1,0 +1,102 @@
+{
+  "tasks": [
+    {
+      "id": "init-1",
+      "text": "Continue working through Linear tickets in home page epic",
+      "category": "FF",
+      "priority": "high",
+      "status": "in-progress",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-2",
+      "text": "Fix mobile view: footer too big and odd spacings",
+      "category": "LO.com",
+      "priority": "high",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-3",
+      "text": "Set up analytics for LO.com",
+      "category": "LO.com",
+      "priority": "high",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-4",
+      "text": "Write more essays with GEO in mind to establish authority",
+      "category": "Blog",
+      "priority": "medium",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-5",
+      "text": "Figure out Beehiiv situation to get API key for LO.com email list",
+      "category": "Blog",
+      "priority": "medium",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-6",
+      "text": "Figure out Pinterest strategy for new account",
+      "category": "Pinterest",
+      "priority": "medium",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-7",
+      "text": "Create more pins for other essays",
+      "category": "Pinterest",
+      "priority": "medium",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-8",
+      "text": "Finish blog pin generator n8n automation (checklist from previous chat)",
+      "category": "n8n",
+      "priority": "medium",
+      "status": "in-progress",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-9",
+      "text": "Go through list of automation ideas for monetization, growth, and fun",
+      "category": "n8n",
+      "priority": "medium",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-10",
+      "text": "Make more static posts for Instagram",
+      "category": "Insta",
+      "priority": "low",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    },
+    {
+      "id": "init-11",
+      "text": "Make more reels for Instagram",
+      "category": "Insta",
+      "priority": "low",
+      "status": "todo",
+      "createdAt": "2026-05-12T00:00:00Z"
+    }
+  ],
+  "categoryPriorities": {
+    "FF": "high",
+    "LO.com": "high",
+    "Blog": "medium",
+    "Pinterest": "medium",
+    "n8n": "medium",
+    "Insta": "low",
+    "Other": "medium"
+  },
+  "lastUpdated": "2026-05-12T00:00:00Z"
+}
